@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import TextError from './TextError';
 import axios from "axios"
+import { BASE_URL } from './common/config';
 
 
 
@@ -22,13 +23,24 @@ const validationSchema = Yup.object({
 });
 
 const Login = () => {
-
+const url = window.location.href;
+const d = url.split("/")
+const s = d[3];
+  
   const onSubmit = values => {
   
-    axios.post('https://art-cart-backend-production.up.railway.app/auth/signin', values)
+    axios.post(`${BASE_URL}/auth/signin`, values)
      .then(res => {
-       navigate('/')
-       console.log(res.data)
+      //  navigate('/')
+      //  console.log(res.data.auth)
+      if(res.data.auth && res.data.role==="ROLE_CUSTOMER") {
+        console.log(res.data);
+        navigate("/")
+     } 
+      else if(res.data.auth && res.data.role==="ROLE_SELLER"){
+        console.log(res.data);
+        navigate("/seller/dashboard")
+      }
      })
      .then(err => console.log(err))
   };
@@ -55,7 +67,7 @@ const Login = () => {
            
           <Form>
           <h2 className="title">Log In</h2>
-          <p>Become an ArtWork. <NavLink to="/register" className="log-in" >Join</NavLink></p>
+          <p>Become an ArtWork. <NavLink to={s==='seller'?'/seller/register':'/register'} className="log-in" >Join</NavLink></p>
             <div className="form-control">
               <label htmlFor="email">Email</label>
               <Field

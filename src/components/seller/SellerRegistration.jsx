@@ -1,47 +1,94 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { NavLink, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import TextError from '../TextError';
 import axios from "axios"
+import { BASE_URL } from '../common/config';
+
+// import {BASE_URI} from '../common/config'
 
 
 const initialValues = {
     sellerName:"",
-    email: "",
-    password: "",
     sellerPhone:"",
-    sellerImage:"",
-    aadhaarImage:"",
     aadhaarNo: "",
-
-
-
-
-
-
   };
 
   const validationSchema = Yup.object({
     sellerName: Yup.string().required("Please Enter your name"),
-    email: Yup.string().required("Email Required").email("Invalid Email Format"),
-    password: Yup.string().required("Password Required").min(8, 'Password must be at least 8 characters'),
     aadhaarNo: Yup.string().required("Please Enter Aadhaar Number").min(12,'Aadhaar Number must be at least 12 numbers')
     
   });
 
 const SellerRegistration = () => {
 
-    const onSubmit = values => {
+    const [profileImage,setProfileImage] = useState(null);
+    const [aadhaarImage,setAdhaarImage] = useState(null);
+
+
+    const handleProfileImageChange =(e)=>{
+      const file = e.target.files[0];
+      setProfileImage(file);
+
+    }
+
+    const handleAadhaarImageChange =(e)=>{
+      console.log("aadhaar image")
+      const file = e.target.files[0];
+      setAdhaarImage(file)
+    }
   
-        axios.post('https://art-cart-backend-production.up.railway.app/auth/signin', values)
-         .then(res => {
-           navigate('/')
-           console.log(res.data)
-         })
-         .then(err => console.log(err))
-      };
+    const onSubmitHandle = async values => {
+      console.log("submit");
+      // let ob = {
+      //   "name":values.sellerName,
+      //   "aadhaarNo":values.aadhaarNo,
+      //   "phoneNumber":values.sellerPhone
+      // }
+
+      const ob = `{
+        "name" : "${values.sellerName}",
+        "aadhaarNo" : "${values.aadhaarNo }",
+        "phoneNumber" :"${values.sellerPhone}"
+      }`
+
+      console.log(ob)
+
+      
+      const data1 = new FormData();
+      data1.append("aadhaarImage",aadhaarImage);
+      data1.append("profileImage",profileImage);
+      data1.append("data",ob)
+
+
+      console.log(aadhaarImage)
+      console.log(profileImage)
+    const res = await fetch(`${BASE_URL}/api/seller/save`,{
+      method: 'POST',
+      body:data1,
+      headers:{
+        Authorization : 'Bearer ' + "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJtYW5hc2giLCJpYXQiOjE3MTI3MzM5MTAsImV4cCI6MTcxMjgyMDMxMCwiZW1haWwiOiJzQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX1NFTExFUiJ9.1WrFBA5UKcwHQru6p8HTfnxdToB6trwOGKeCcj6LN9E"
+      }
+      
+     })
+
+     const resData = await res.json();
+     console.log(resData);
+
+    //  axios.post(`${BASE_URL}/api/seller/save`,data,{
+    //      headers:{
+    //     "Content-Type": "application/json",
+    //     Authorization : 'Bearer ' + "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJtYW5hc2giLCJpYXQiOjE3MTI3MzA5OTIsImV4cCI6MTcxMjgxNzM5MiwiZW1haWwiOiJhYmhpc2hla0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9TRUxMRVIifQ.whnEzhf0FuDHXp-p8IwMBp6veNcuJyn-bh9-npZoB2"
+    //   }
+    // }).then(res=>{
+    //   console.log(res.data)
+    // })
+
+  
+    
+    }
       
      const navigate = useNavigate();
 
@@ -58,9 +105,9 @@ const SellerRegistration = () => {
       <div className="registrationSection">
 
         <Formik 
-        initialValues = {initialValues}
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}
+          initialValues = {initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmitHandle}
         >
          
         <Form style={{ overflowY: 'scroll' } }>
@@ -76,28 +123,6 @@ const SellerRegistration = () => {
             />
             <ErrorMessage name='sellerName' component={TextError} />
         </div>
-
-        <div className="form-control">
-            <label htmlFor="email">Email*</label>
-            <Field
-              type='email'
-              id="email"
-              name='email'
-            />
-            <ErrorMessage name='email' component={TextError} />
-          </div>
-
-
-          <div className="form-control">
-            <label htmlFor="password">Password*</label>
-            <Field
-              type='password'
-              id="password"
-              name='password'
-              
-            />
-            <ErrorMessage name='password' component={TextError} />
-          </div>
 
           <div className="form-control">
             <label htmlFor="sellerPhone">Phone No.*</label>
@@ -118,23 +143,48 @@ const SellerRegistration = () => {
               type='file'
               id="sellerImage"
               name='sellerImage'
-              accept=".pdf, .jpg, .jpeg, .png" 
+              accept=".jpg, .jpeg, .png" 
+              onChange={handleProfileImageChange}
               required
+            
+            
+
+            
             />
             <ErrorMessage name='ID Proof' component={TextError} />
           </div>
+          <div className="form-control">
+            <label htmlFor="a">Aadhaar Image*</label>
+            <Field
+              type='file'
+              id="a"
+              name='a'
+              accept=".jpg, .jpeg, .png" 
+              onChange={handleAadhaarImageChange}
+              required
+            
+            
 
+            
+            />
+            <ErrorMessage name='ID Proof' component={TextError} />
+          </div>
+{/* 
           <div className="form-control">
             <label htmlFor="aadhaarImage">Aadhaar Image Proof*</label>
             <Field
               type='file'
               id="aadhaarImage"
               name='aadhaarImage'
-              accept=".pdf, .jpg, .jpeg, .png" 
+              accept=".jpg, .jpeg, .png" 
+              onChange={handleAadhaarImageChange}
               required
+              
             />
             <ErrorMessage name='ID Proof' component={TextError} />
-          </div>
+          </div> */}
+
+          
 
           <div className="form-control">
             <label htmlFor="aadhaarNo">Aadhaar Number</label>
@@ -148,43 +198,6 @@ const SellerRegistration = () => {
             />
             <ErrorMessage name='Aadhaar No.' component={TextError} />
           </div>
-
-          <div className="form-control">
-            <div >
-            <Field
-              type='checkbox'
-              id="checkPrivacy"
-              name='checkPrivacy'
-             
-              required
-            />
-            <h4 className=''> I accept the <a href="/terms-of-service">Terms of Service</a>.</h4>
-            
-            
-            <ErrorMessage name='please accept' component={TextError} />
-            </div>
-         
-          </div>
-
-         
-
-          
-
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-
-          
-          
           <button type='submit'>Login</button>
          
         </Form>

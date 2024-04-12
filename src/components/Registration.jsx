@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import { NavLink } from 'react-router-dom';
+import { NavLink ,useLocation } from 'react-router-dom';
 import * as Yup from 'yup';
 import TextError from './TextError';
 import axios from "axios";
+import { BASE_URL } from './common/config';
 
 const initialValues = {
   email: "",
@@ -12,12 +13,20 @@ const initialValues = {
 };
 
 const onSubmit = values => {
+    values["role"] = "seller"
+    const url = window.location.href;
+    const d = url.split("/")
+    const r = d[3];
 
-    values["role"] = "admin"
-    console.log( values)
-    axios.post('https://art-cart-backend-production.up.railway.app/auth/signup', values)
+    if(r==='seller')
+      values["role"] = "seller"
+    else
+    values["role"] = "customer"
+    console.log(values)
+    // console.log( values)
+    axios.post(`${BASE_URL}/auth/signup`, values)
      .then(res => {
-       console.log(res.data)
+       console.log("res",res.data)
      })
      .then(err => console.log(err))
 };
@@ -29,7 +38,9 @@ const validationSchema = Yup.object({
 
 const Registration = () => {
  
-
+  const url = window.location.href;
+  const d = url.split("/")
+  let s = d[3];
   return (
     <Wrapper>
       <div className="container">
@@ -72,7 +83,7 @@ const Registration = () => {
             </div>
             
             <button type='submit'>Submit</button>
-            <p>Already a member? <NavLink className="log-in" to={"/login"}>Log in</NavLink></p>
+            <p>Already a member? <NavLink className="log-in" to={s==='seller'?'/seller/login':'/login'}>Log in</NavLink></p>
           </Form>
 
          

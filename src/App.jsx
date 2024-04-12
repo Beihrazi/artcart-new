@@ -57,6 +57,11 @@ const App = () => {
         <Route path='/' element={<ProductPage/>} />
         <Route path='/product/:id' element={<SingleProduct/>} />
         <Route path='/login' element={<Login/>} />
+        <Route path='/seller/dashboard' element={<Dashboard/>} />
+        <Route path='/seller/register' element={<Registration/>} />
+        <Route path='/seller/login' element={<Login/>} />
+        <Route path='/seller/completeprofile' element={<SellerRegistration/>} />
+
 
 
 

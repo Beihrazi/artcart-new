@@ -1,13 +1,21 @@
 import React from 'react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import Footer2 from '../common/Footer2'
 import Header from '../common/Header'
 import AddProduct from './dashboardCompo/AddProduct'
 import ManageOrders from './dashboardCompo/ManageOrders'
 import ManageProducts from './dashboardCompo/ManageProducts'
+import SellerRegistration from './SellerRegistration'
 
 const buttons=[
+    {
+        name:"Complete your profile", 
+        type:"button",
+        id:"complete-profile",
+    },
+    ,
     {
         name:"Add Product",
         type:"button",
@@ -32,6 +40,9 @@ const buttons=[
 
 const Dashboard = () => {
 
+   const navigate =  useNavigate();
+    
+
     const [btID,SetbtID] =useState("add-product");
     
     const handleClick = (e) =>{
@@ -53,6 +64,7 @@ const Dashboard = () => {
                     <div className='secondSec'>
                         {console.log(btID)}
                         {btID === "add-product" && <AddProduct />}
+                        {btID === "complete-profile" && navigate("/seller/completeprofile")}
                        
                         {btID === "manage-orders" && <ManageOrders />}
                         {btID === "manage-products" && <ManageProducts />}
@@ -76,7 +88,7 @@ const Wrapper = styled.section`
     justify-content: center;
     align-items: center;
     .container{
-        height:900px
+        height:1000px
         background-color: white;
        display:flex;
         
